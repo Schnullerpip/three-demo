@@ -15,9 +15,6 @@ onMounted(() => {
         throw new Error('Could NOT find canvas!')
   }
 
-  canvas.width = 1280 * 2
-  canvas.height= 739 * 2
-
   const renderer = getRenderer(canvas)
   const camera = getCamera()
   const light = getLight()
@@ -37,7 +34,10 @@ onMounted(() => {
 
   function render(time: number) {
     time *= 0.001
-    cube.rotation.x = 1/6 * Math.PI
+
+    onResize(camera, renderer)
+
+    cube.rotation.x = time
     cube.rotation.y = time
 
     renderer.render(scene, camera)
@@ -45,6 +45,22 @@ onMounted(() => {
   }
   requestAnimationFrame(render)
 })
+
+function onResize(camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) {
+  const canvas = renderer.domElement
+  const pixelRatio = window.devicePixelRatio
+  const width = canvas.clientWidth * pixelRatio | 0
+  const height = canvas.clientHeight * pixelRatio | 0
+  if(width != canvas.width || height !== canvas.height) {
+    renderer.setSize(width, height, false)
+    cameraPerspectiveUpdate(camera, canvas)
+  }
+}
+
+function cameraPerspectiveUpdate(camera: THREE.PerspectiveCamera, canvas: HTMLCanvasElement) {
+  camera.aspect = canvas.clientWidth / canvas.clientHeight
+  camera.updateProjectionMatrix()
+}
 </script>
 
 
@@ -56,7 +72,6 @@ onMounted(() => {
 <!-- STYLE -->
 <style scoped>
 canvas {
-  width: 100vh;
-  height: 55vh;
+  width: 100%;
 }
 </style>
