@@ -1,14 +1,9 @@
 import * as THREE from 'three'
 
 /**
- * Creates a renderer for an existing canvas element with the given id
+ * Creates a renderer for an existing canvas element
  */
-export function getRenderer(canvasId: String): THREE.WebGLRenderer {
-    const queriedElement = document.querySelector('#c')
-    if(!queriedElement) {
-        throw new Error('three-setup.ts::Could NOT find canvas!')
-    }
-    const canvas = queriedElement as HTMLCanvasElement
+export function getRenderer(canvas: HTMLCanvasElement): THREE.WebGLRenderer {
     return new THREE.WebGLRenderer({canvas})
 }
 
@@ -22,4 +17,13 @@ export function getCamera(): THREE.PerspectiveCamera {
     const far = 5
     const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
     return camera
+}
+
+/**
+ * Creates a directional light
+ */
+export function getLight(): THREE.DirectionalLight {
+    const color = 0xFFFFFF
+    const intensity = 1
+    return new THREE.DirectionalLight(color, intensity)
 }
