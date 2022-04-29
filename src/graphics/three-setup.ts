@@ -1,10 +1,23 @@
 import * as THREE from 'three'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 
 /**
  * Creates a renderer for an existing canvas element
  */
 export function getRenderer(canvas: HTMLCanvasElement): THREE.WebGLRenderer {
     return new THREE.WebGLRenderer({canvas, antialias: true})
+}
+
+/**
+ * Creates a post-processing render pipeline
+ * When using a composer you should use the composer's render function instead of the renderer's one
+ * as it will use the renderer internally to create the first pass
+ */
+export function getComposer(renderer: THREE.WebGLRenderer, camera: THREE.PerspectiveCamera, scene: THREE.Scene): EffectComposer {
+    const composer = new EffectComposer(renderer)
+    composer.addPass(new RenderPass(scene, camera))
+    return composer
 }
 
 /**

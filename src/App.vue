@@ -2,9 +2,10 @@
 
 <!-- SCRIPT -->
 <script setup lang="ts">
-import { getCamera, getLight, getRenderer } from '../src/graphics/three-setup'
+import { getCamera, getComposer, getLight, getRenderer } from '../src/graphics/three-setup'
 import { onMounted } from 'vue'
 import * as THREE from 'three'
+import { Vector2 } from 'three'
 
 
 onMounted(() => {
@@ -15,9 +16,12 @@ onMounted(() => {
         throw new Error('Could NOT find canvas!')
   }
 
-  const renderer = getRenderer(canvas)
   const camera = getCamera()
   const light = getLight()
+  const scene = new THREE.Scene()
+
+  const renderer = getRenderer(canvas)
+  const composer = getComposer(renderer, camera, scene)
 
   const cube = (() => {
     const geometry = new THREE.BoxGeometry(1, 1, 1)
@@ -28,34 +32,37 @@ onMounted(() => {
   light.position.set(-1, 2, 4)
   camera.position.z = 2 // +z goes towards the viewer -z away from viewer
 
-  const scene = new THREE.Scene()
   scene.add(cube)
   scene.add(light)
 
-  const onResize = createOnResizeHandler(camera, renderer)
+  const onResize = createOnResizeHandler(camera, composer)
+  window.onresize = onResize
+  onResize()
 
-  function render(time: number) {
-    time *= 0.001
+  let then = 0
+  function render(now: number) {
+    now *= 0.001
+    const deltaTime = now - then
+    then = now
 
-    onResize()
+    cube.rotation.x = now
+    cube.rotation.y = now
 
-    cube.rotation.x = time
-    cube.rotation.y = time
-
-    renderer.render(scene, camera)
+    composer.render(deltaTime)
     requestAnimationFrame(render)
   }
   requestAnimationFrame(render)
 })
 
-const createOnResizeHandler = ((camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) => {
-    const canvas = renderer.domElement
+const createOnResizeHandler = ((camera: THREE.PerspectiveCamera, composer: ReturnType<typeof getComposer>) => {
+    const canvas = composer.renderer.domElement
     const pixelRatio = window.devicePixelRatio
   return () => {
     const width = canvas.clientWidth * pixelRatio | 0
     const height = canvas.clientHeight * pixelRatio | 0
     if(width != canvas.width || height !== canvas.height) {
-      renderer.setSize(width, height, false)
+      composer.setSize(width, height)
+      composer.renderer.setSize(width, height, false)
       cameraPerspectiveUpdate(camera, canvas)
     }
   }
