@@ -32,10 +32,12 @@ onMounted(() => {
   scene.add(cube)
   scene.add(light)
 
+  const onResize = createOnResizeHandler(camera, renderer)
+
   function render(time: number) {
     time *= 0.001
 
-    onResize(camera, renderer)
+    onResize()
 
     cube.rotation.x = time
     cube.rotation.y = time
@@ -46,16 +48,18 @@ onMounted(() => {
   requestAnimationFrame(render)
 })
 
-function onResize(camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) {
-  const canvas = renderer.domElement
-  const pixelRatio = window.devicePixelRatio
-  const width = canvas.clientWidth * pixelRatio | 0
-  const height = canvas.clientHeight * pixelRatio | 0
-  if(width != canvas.width || height !== canvas.height) {
-    renderer.setSize(width, height, false)
-    cameraPerspectiveUpdate(camera, canvas)
+const createOnResizeHandler = ((camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) => {
+    const canvas = renderer.domElement
+    const pixelRatio = window.devicePixelRatio
+  return () => {
+    const width = canvas.clientWidth * pixelRatio | 0
+    const height = canvas.clientHeight * pixelRatio | 0
+    if(width != canvas.width || height !== canvas.height) {
+      renderer.setSize(width, height, false)
+      cameraPerspectiveUpdate(camera, canvas)
+    }
   }
-}
+})
 
 function cameraPerspectiveUpdate(camera: THREE.PerspectiveCamera, canvas: HTMLCanvasElement) {
   camera.aspect = canvas.clientWidth / canvas.clientHeight
