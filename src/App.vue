@@ -5,7 +5,7 @@
 import { getCamera, getComposer, getLight, getRenderer } from '../src/graphics/three-setup'
 import { onMounted } from 'vue'
 import * as THREE from 'three'
-import { Vector2 } from 'three'
+import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass'
 
 
 onMounted(() => {
@@ -28,6 +28,9 @@ onMounted(() => {
     const material = new THREE.MeshPhongMaterial({color: 0x44aa88})
     return new THREE.Mesh(geometry, material)
   })()
+
+  // example post-processing pass
+  //composer.addPass(new FilmPass(0.35,0.025,648,1))
 
   light.position.set(-1, 2, 4)
   camera.position.z = 2 // +z goes towards the viewer -z away from viewer
