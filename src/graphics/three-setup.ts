@@ -4,7 +4,7 @@ import * as THREE from 'three'
  * Creates a renderer for an existing canvas element
  */
 export function getRenderer(canvas: HTMLCanvasElement): THREE.WebGLRenderer {
-    return new THREE.WebGLRenderer({canvas})
+    return new THREE.WebGLRenderer({canvas, antialias: true})
 }
 
 /**
