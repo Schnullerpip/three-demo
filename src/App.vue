@@ -46,7 +46,8 @@ onMounted(async () => {
   //composer.addPass(new FilmPass(0.35,0.025,648,1))
 
   light.position.set(-1, 2, 4)
-  camera.position.z = 2 // +z goes towards the viewer -z away from viewer
+  camera.position.z = 5 // +z goes towards the viewer -z away from viewer
+  cube.translateX(-4)
 
   scene.add(cube)
   scene.add(light)
