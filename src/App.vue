@@ -5,6 +5,8 @@
 import { createOnResizeHandler, getCamera, getComposer, getLight, getRenderer } from '../src/graphics/three-setup'
 import { onMounted } from 'vue'
 import * as THREE from 'three'
+import { PlaneGeometry } from 'three'
+import wbBannerImg from "../src/assets/wb-banner.jpeg"
 //import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass'
 
 
@@ -36,11 +38,14 @@ onMounted(async () => {
     vertexShader,
     fragmentShader,
     uniforms: {
-      uTime: { value: 0.0 }
+      uTime: { value: 0.0 },
+      uTexture: {value: new THREE.TextureLoader().load(wbBannerImg)},
     },
+    wireframe: true
   })
 
   const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material)
+  const plane = new THREE.Mesh(new PlaneGeometry(8, 8*0.5625, 64, 64), material)
 
   // example post-processing pass
   //composer.addPass(new FilmPass(0.35,0.025,648,1))
@@ -48,9 +53,11 @@ onMounted(async () => {
   light.position.set(-1, 2, 4)
   camera.position.z = 5 // +z goes towards the viewer -z away from viewer
   cube.translateX(-4)
+  plane.translateX(2)
 
   scene.add(cube)
   scene.add(light)
+  scene.add(plane)
 
   let then = 0
   function render(now: number) {

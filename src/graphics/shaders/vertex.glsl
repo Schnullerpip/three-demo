@@ -1,5 +1,18 @@
+precision mediump float;
+
+varying vec2 vUv;
 uniform float uTime;
-varying vec3 pos;
+
+//
+// Description : Array and textureless GLSL 2D/3D/4D simplex
+//               noise functions.
+//      Author : Ian McEwan, Ashima Arts.
+//  Maintainer : ijm
+//     Lastmod : 20110822 (ijm)
+//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.
+//               Distributed under the MIT License. See LICENSE file.
+//               https://github.com/ashima/webgl-noise
+//
 
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -88,18 +101,18 @@ float snoise(vec3 v) {
   // Mix final noise value
   vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
   m = m * m;
-  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),
+  return 120.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),
                                 dot(p2,x2), dot(p3,x3) ) );
 }
 
 void main() {
+  vUv = uv;
 
-  pos = position;
-  float noiseFreq = 1.5;
-  float noiseAmp = 0.1;
-  vec3 noisePos = vec3(pos.x * noiseFreq + uTime, pos.y, pos.z);
-  pos.x += snoise(noisePos) * noiseAmp;
+  vec3 pos = position;
+  float noiseFreq = 0.3;
+  float noiseAmp = 0.1; 
+  vec3 noisePos = vec3(pos.x * noiseFreq + uTime, pos.y + uTime, pos.z + uTime);
+  pos.z += snoise(noisePos) * noiseAmp;
 
-  vec4 modelViewPosition = modelViewMatrix * vec4(pos, 1.0);
-  gl_Position = projectionMatrix * modelViewPosition; 
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.);
 }
