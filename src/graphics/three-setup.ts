@@ -40,3 +40,23 @@ export function getLight(): THREE.DirectionalLight {
     const intensity = 1
     return new THREE.DirectionalLight(color, intensity)
 }
+
+
+/**
+ * Creates a callable function that correctly configures the camera aspect & the render-pipeline.
+ * The returned function should ideally be called once on startup and whenever the canvas is resized.
+ */
+export const createOnResizeHandler = ((camera: THREE.PerspectiveCamera, composer: ReturnType<typeof getComposer>) => {
+    const canvas = composer.renderer.domElement
+    const pixelRatio = window.devicePixelRatio
+  return () => {
+    const width = canvas.clientWidth * pixelRatio | 0
+    const height = canvas.clientHeight * pixelRatio | 0
+    if(width != canvas.width || height !== canvas.height) {
+        composer.setSize(width, height)
+        composer.renderer.setSize(width, height, false)
+        camera.aspect = canvas.clientWidth / canvas.clientHeight
+        camera.updateProjectionMatrix()
+    }
+  }
+})
