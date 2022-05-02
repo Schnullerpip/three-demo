@@ -29,6 +29,7 @@ onMounted(async () => {
 
   const renderer = getRenderer(canvas)
   const composer = getComposer(renderer, camera, scene)
+  renderer.setClearColor(0x338877)
 
   const onResize = createOnResizeHandler(camera, composer)
   window.onresize = onResize
@@ -41,19 +42,20 @@ onMounted(async () => {
       uTime: { value: 0.0 },
       uTexture: {value: new THREE.TextureLoader().load(wbBannerImg)},
     },
-    wireframe: true
   })
 
-  const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material)
+  const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshPhongMaterial())
   const plane = new THREE.Mesh(new PlaneGeometry(8, 8*0.5625, 64, 64), material)
 
   // example post-processing pass
   //composer.addPass(new FilmPass(0.35,0.025,648,1))
 
-  light.position.set(-1, 2, 4)
+  light.position.set(0, 0, 4)
   camera.position.z = 5 // +z goes towards the viewer -z away from viewer
   cube.translateX(-4)
   plane.translateX(2)
+  plane.rotateY(-0.35 * Math.PI)
+  plane.rotateZ(0.1 * Math.PI)
 
   scene.add(cube)
   scene.add(light)

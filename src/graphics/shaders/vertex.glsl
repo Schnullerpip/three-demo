@@ -1,6 +1,7 @@
 precision mediump float;
 
 varying vec2 vUv;
+varying float vWave;
 uniform float uTime;
 
 //
@@ -110,9 +111,11 @@ void main() {
 
   vec3 pos = position;
   float noiseFreq = 0.3;
-  float noiseAmp = 0.1; 
+  float noiseAmp = 0.2; 
   vec3 noisePos = vec3(pos.x * noiseFreq + uTime, pos.y + uTime, pos.z + uTime);
-  pos.z += snoise(noisePos) * noiseAmp;
+  float noise = snoise(noisePos);
+  pos.z += noise * noiseAmp;
+  vWave = pos.z;
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.);
 }
