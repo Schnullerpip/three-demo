@@ -3,8 +3,21 @@ import * as THREE from 'three'
 
 type Point = {x: number, y: number, age: number, force: number, velocityX: number, velocityY: number}
 
+function easeOutSine(t: number, b: number, c: number, d: number) {
+    return c * Math.sin((t / d) * (Math.PI / 2)) + b;
+};
+  
+function easeOutQuad(t: number, b: number, c: number, d: number) {
+    t /= d;
+    return -c * t * (t - 2) + b;
+};
+
 export class DrawableTexture {
-    private readonly maxAge = 60
+
+    private readonly width = 60
+    private readonly height = this.width
+
+    private readonly maxAge = 200
     private readonly points: Point[] = []
 
     private readonly offset: number
@@ -17,10 +30,10 @@ export class DrawableTexture {
 
     readonly texture = new THREE.Texture(this.hiddenCanvas)
 
-    constructor(readonly width: number, readonly height: number) {
+    constructor() {
         const UUID = generateUUID()
 
-        this.radius = Math.min(width, height) * 0.1
+        this.radius = Math.min(this.width, this.height) * 0.333333
         this.offset = this.width * 5.
 
         this.hiddenCanvas.id = `drawableTexture${UUID}`
@@ -100,17 +113,26 @@ export class DrawableTexture {
             y: point.y * this.height
         }
 
+        let intensity = 1;
+        //intensity = 1 - point.age/this.maxAge
+        if(point.age < this.maxAge * 0.3) {
+            intensity = easeOutSine(point.age / (this.maxAge * .3),0,1,1)
+        } else {
+            intensity = easeOutQuad(1 - (point.age - this.maxAge * 0.3) / (this.maxAge * 0.7), 0, 1, 1)
+        }
+        intensity *= point.force
+
         let red = ((point.velocityX + 1) / 2) * 255;
         let green = ((point.velocityY + 1) / 2) * 255;
         // B = Unit vector
         let blue = point.force * 255;
         let color = `${red}, ${green}, ${blue}`;
 
-        this.ctx.shadowColor = `rgba(${color}, ${.2 * (1 - point.age / this.maxAge)})`
+        this.ctx.shadowColor = `rgba(${color}, ${.2 * intensity})`
 
         ctx.beginPath()
         ctx.fillStyle = "rgby(255,0,0,1)"
-        ctx.arc(position.x - this.offset, position.y - this.offset, this.radius + point.age, 0, Math.PI * 2)
+        ctx.arc(position.x - this.offset, position.y - this.offset, this.radius * 0.2 + this.radius * point.age/this.maxAge, 0, Math.PI * 2)
         ctx.fill()
     }
 }

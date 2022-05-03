@@ -2,7 +2,7 @@
 
 <!-- SCRIPT -->
 <script setup lang="ts">
-import { createOnResizeHandler, getCamera, getComposer, getLight, getRenderer } from '../src/graphics/three-setup'
+import { createOnResizeHandler, getCamera, getComposer, getLight, getRenderer, isWebglSupported } from '../src/graphics/three-setup'
 import { onMounted } from 'vue'
 import * as THREE from 'three'
 import { PlaneGeometry } from 'three'
@@ -10,15 +10,20 @@ import wbBannerImg from "../src/assets/wb-banner.jpeg"
 import { DrawableTexture } from './utils/DrawableTexture'
 //import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass'
 
-const drawableTexture = new DrawableTexture(300, 300 * 0.5625)
+const drawableTexture = new DrawableTexture()
 
 
 onMounted(async () => {
 
+
   const canvas = document.querySelector('#c') as HTMLCanvasElement
 
   if(!canvas) {
-        throw new Error('Could NOT find canvas!')
+    throw new Error('Could NOT find canvas!')
+  }
+
+  if(!isWebglSupported()) {
+    throw new Error("WebGL not supported! :(")
   }
 
   const [vertexShader, fragmentShader] = await Promise.all([

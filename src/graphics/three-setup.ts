@@ -2,11 +2,26 @@ import * as THREE from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 
+
+
+/**
+ * Checks whether the user's device can display webgl stuff
+ */
+export function isWebglSupported (canvas: HTMLCanvasElement = document.createElement('canvas') as HTMLCanvasElement) { 
+   try {
+    return !!window.WebGLRenderingContext &&
+      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+   } catch(e) {
+     return false;
+   }
+ };
+
 /**
  * Creates a renderer for an existing canvas element
  */
 export function getRenderer(canvas: HTMLCanvasElement): THREE.WebGLRenderer {
-    return new THREE.WebGLRenderer({canvas, antialias: true})
+    //with WebGlRenderer (webgl 2) some things don't work in android...
+    return new THREE.WebGL1Renderer({canvas, antialias: true})
 }
 
 /**
