@@ -7,7 +7,10 @@ import { onMounted } from 'vue'
 import * as THREE from 'three'
 import { PlaneGeometry } from 'three'
 import wbBannerImg from "../src/assets/wb-banner.jpeg"
+import { DrawableTexture } from './utils/DrawableTexture'
 //import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass'
+
+const drawableTexture = new DrawableTexture(300, 300 * 0.5625)
 
 
 onMounted(async () => {
@@ -20,7 +23,7 @@ onMounted(async () => {
 
   const [vertexShader, fragmentShader] = await Promise.all([
     await (await fetch('src/graphics/shaders/vertex.glsl')).text(),
-    await (await fetch('src/graphics/shaders/fragment.glsl')).text(),
+    await (await fetch('src/graphics/shaders/waterDisplacementFragment.glsl')).text(),
   ])
 
   const camera = getCamera()
@@ -41,6 +44,7 @@ onMounted(async () => {
     uniforms: {
       uTime: { value: 0.0 },
       uTexture: {value: new THREE.TextureLoader().load(wbBannerImg)},
+      uDisplacementTexture: {value: drawableTexture.texture}
     },
   })
 
@@ -54,8 +58,7 @@ onMounted(async () => {
   camera.position.z = 5 // +z goes towards the viewer -z away from viewer
   cube.translateX(-4)
   plane.translateX(2)
-  plane.rotateY(-0.35 * Math.PI)
-  plane.rotateZ(0.1 * Math.PI)
+  plane.rotateY(-0.14 * Math.PI)
 
   scene.add(cube)
   scene.add(light)
@@ -63,6 +66,7 @@ onMounted(async () => {
 
   let then = 0
   function render(now: number) {
+    drawableTexture.update()
     now *= 0.001
     const deltaTime = now - then
     then = now
@@ -75,6 +79,22 @@ onMounted(async () => {
     requestAnimationFrame(render)
   }
   requestAnimationFrame(render)
+})
+
+
+let lastPointAddTime = 0
+window.addEventListener('mousemove', (mouseEvent: MouseEvent) => {
+  const now = Date.now()
+  if(now - lastPointAddTime > 15) {
+    lastPointAddTime = now
+    const point = {
+      x: mouseEvent.clientX/window.innerWidth,
+      y: mouseEvent.clientY/window.innerHeight,
+    }
+    drawableTexture.addPoint(point)
+  }
+}, {
+  passive: true
 })
 </script>
 

@@ -110,8 +110,8 @@ void main() {
   vUv = uv;
 
   vec3 pos = position;
-  float noiseFreq = 0.3;
-  float noiseAmp = 0.2; 
+  float noiseFreq = 0.2;
+  float noiseAmp = 0.1; 
   vec3 noisePos = vec3(pos.x * noiseFreq + uTime, pos.y + uTime, pos.z + uTime);
   float noise = snoise(noisePos);
   pos.z += noise * noiseAmp;
